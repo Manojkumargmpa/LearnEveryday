@@ -3,6 +3,7 @@ import './styles.css';
 import initialFacts from './initialFacts';
 
 
+
 function App() {
   const [showForm, setShowForm] = useState(false);
   const [facts, setFacts] = useState(initialFacts);
@@ -209,13 +210,14 @@ function FactList({ facts, setFacts }) {
     <section>
       <ul className='facts-list'>
         {facts.map((fact) => (
-          <Fact key={fact.id} fact={fact} setFacts={setFacts} />
+          <Fact key={fact.id} fact={fact} facts={facts} setFacts={setFacts} />
         ))}
       </ul>
       <p>There are {facts.length} facts in the database. Add your own!</p>
     </section>
   );
 }
+
 
 function Fact({ fact, facts, setFacts }) {
   const [isUpdating, setIsUpdating] = useState(false);
