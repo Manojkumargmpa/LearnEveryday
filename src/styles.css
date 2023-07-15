@@ -36,7 +36,7 @@ body {
 
 .main {
     display: grid;
-    grid-template-columns: 150px 1fr;
+    grid-template-columns: 160px 1fr;
     gap: 28px;
 }
 @media (max-width:900px) {

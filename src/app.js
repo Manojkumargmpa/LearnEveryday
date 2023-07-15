@@ -53,12 +53,12 @@ function Loader() {
 }
 
 function Header({ showForm, setShowForm }) {
-  const appTitle = 'Today I Learned';
+  const appTitle = 'LEARN EVERYDAY';
 
   return (
     <header className='header'>
       <div className='logo'>
-        <img src='logo.png' height='68' width='68' alt='Today I Learned Logo' />
+        <img src='https://static.vecteezy.com/system/resources/thumbnails/000/586/123/small/sarmi2-08.jpg' height='68' width='68' alt='Today I Learned Logo' />
         <h1>{appTitle}</h1>
       </div>
 
