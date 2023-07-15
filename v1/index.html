@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./styles.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Coiny&family=Sono&display=swap" rel="stylesheet">
+    <title>Today-I-learned</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <img src="https://images-platform.99static.com//-IB-flwbGWHCs6QSOKUKcCkY0pI=/249x106:749x606/fit-in/500x500/99designs-contests-attachments/97/97064/attachment_97064247"
+                    alt="logo" />
+
+                <h1>Today I learned</h1>
+            </div>
+            <button class="btn-large btn btn-open">share a fact</button>
+        </div>
+        <form class="fact-form hidden">
+            <input type="text" placeholder="share a fact with the world" />
+            <span>200</span>
+            <input type="text" placeholder="Trustworthy source" />
+            <select>
+                <option value="">Choose category</option>
+                <!-- we never want user to actually select this one -->
+                <option value="Technology">Technology</option>
+                <option value="Science">Science</option>
+            </select>
+            <button class="btn btn-large">post</button>
+        </form>
+        <div class="main">
+            <div class="aside">
+                <ul>
+                <li class="category"><button class="btn btn-all-categories">All</button></li>
+               <li class="category"><button class="btn btn-category" style="background-color: #3b82f6">Technology</button></li> 
+                <li class="category"><button class="btn btn-category" style="background-color: #16a34a;">Science</button></li>
+                </ul>
+            </div>
+
+            <div>
+                <ul class="facts-list">
+                    <li class="fact">
+                        <p>React is being developed by Meta (formerly facebook)
+                            <a class="source" href="https://opensource.fb.com/">{Source}</a>
+                        </p>
+                        <span class="tag">#Technology#</span>
+
+                        <div class="vote-buttons">
+                            <button>👍24</button>
+                            <button>😲9</button>
+                            <button>⛔️4 </button>
+                        </div>
+                    </li>
+                    <li class="fact">
+                        <p>React is being developed by Meta (formerly facebook)
+                            <a class="source" href="https://opensource.fb.com/">{Source}</a>
+                        </p>
+                        <span class="tag">#Science#</span>
+
+                        <div class="vote-buttons">
+                            <button>👍29 </button>
+                            <button>😲9 </button>
+                            <button>⛔️4 </button>
+                        </div>
+                    </li>
+
+
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script src="./script.js"></script>
+</body>
+
+</html>
