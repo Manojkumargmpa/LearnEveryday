@@ -1,18 +1,7 @@
 import { useEffect, useState } from 'react';
 import './styles.css';
 const mongoose = require('mongoose');
-
-mongoose.connect('mongodb://localhost:27017/mydatabase', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-  .then(() => {
-    console.log('Connected to MongoDB');
-    // Further code execution or server startup
-  })
-  .catch((error) => {
-    console.error('Error connecting to MongoDB:', error);
-  });
+mongoose.connect('mongodb://127.0.0.1:27017/LearnDB');
 const factSchema = new mongoose.Schema({
   id: Number,
   text: String,
