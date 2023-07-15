@@ -1,36 +1,11 @@
 import { useEffect, useState } from 'react';
 import './styles.css';
-const mongoose = require('mongoose');
-mongoose.connect('mongodb://127.0.0.1:27017/LearnDB');
-const factSchema = new mongoose.Schema({
-  id: Number,
-  text: String,
-  source: String,
-  category: String,
-  votesInteresting: Number,
-  votesMindblowing: Number,
-  votesFalse: Number,
-  createdIn: Number,
-});
+import initialFacts from './initialFacts';
 
-const FactModel = mongoose.model('Fact', factSchema);
-
-// function Counter() {
-//   const [count, setCount] = useState(0);
-
-//   return (
-//     <div>
-//       <span style={{ fontSize: '40px' }}>{count}</span>
-//       <button className='btn btn-large' onClick={() => setCount((c) => c + 1)}>
-//         +1
-//       </button>
-//     </div>
-//   );
-// }
 
 function App() {
   const [showForm, setShowForm] = useState(false);
-  const [facts, setFacts] = useState([]);
+  const [facts, setFacts] = useState(initialFacts);
   const [isLoading, setIsLoading] = useState(false);
   const [currentCategory, setCurrentCategory] = useState('all');
 
@@ -38,21 +13,14 @@ function App() {
     async function getFacts() {
       setIsLoading(true);
 
-      let query = FactModel.find();
+      let filteredFacts = initialFacts;
 
       if (currentCategory !== 'all')
-        query = query.where('category', currentCategory);
+        filteredFacts = initialFacts.filter((fact) => fact.category === currentCategory);
 
-      query = query.sort({ votesInteresting: -1 }).limit(1000);
+      const sortedFacts = filteredFacts.sort((a, b) => b.votesInteresting - a.votesInteresting);
 
-      try {
-        const facts = await query.exec();
-        setFacts(facts);
-      } catch (error) {
-        console.error('Error getting facts:', error);
-        alert('There was a problem getting data');
-      }
-
+      setFacts(sortedFacts);
       setIsLoading(false);
     }
 
@@ -131,35 +99,36 @@ function NewFactForm({ setFacts, setShowForm }) {
   const [isUploading, setIsUploading] = useState(false);
   const textLength = text.length;
 
-  async function handleSubmit(e) {
+  function generateRandomId() {
+    return Math.round(Math.random() * 10000000);
+  }
+
+  function createNewFact() {
+    return {
+      id: generateRandomId(),
+      text,
+      source,
+      category,
+      votesInteresting: 0,
+      votesMindblowing: 0,
+      votesFalse: 0,
+      createdIn: new Date().getFullYear(),
+    };
+  }
+
+  function handleSubmit(e) {
     e.preventDefault();
 
     if (text && isValidHttpUrl(source) && category && textLength <= 200) {
-      setIsUploading(true);
+      const newFact = createNewFact();
 
-      const newFact = new FactModel({
-        id: Math.round(Math.random() * 10000000),
-        text,
-        source,
-        category,
-        votesInteresting: 0,
-        votesMindblowing: 0,
-        votesFalse: 0,
-        createdIn: new Date().getFullYear(),
-      });
+      setFacts((facts) => [newFact, ...facts]);
 
-      try {
-        await newFact.save();
-        setFacts((facts) => [newFact, ...facts]);
-        setText('');
-        setSource('');
-        setCategory('');
-        setShowForm(false);
-      } catch (error) {
-        console.error('Error saving fact:', error);
-      }
+      setText('');
+      setSource('');
+      setCategory('');
 
-      setIsUploading(false);
+      setShowForm(false);
     }
   }
 
@@ -248,27 +217,25 @@ function FactList({ facts, setFacts }) {
   );
 }
 
-function Fact({ fact, setFacts }) {
+function Fact({ fact, facts, setFacts }) {
   const [isUpdating, setIsUpdating] = useState(false);
   const isDisputed =
     fact.votesInteresting + fact.votesMindblowing < fact.votesFalse;
 
-  async function handleVote(columnName) {
+  function handleVote(columnName) {
     setIsUpdating(true);
 
-    try {
-      const updatedFact = await FactModel.findByIdAndUpdate(
-        fact._id,
-        { $inc: { [columnName]: 1 } },
-        { new: true }
-      );
-      setFacts((facts) =>
-        facts.map((f) => (f.id === fact.id ? updatedFact : f))
-      );
-    } catch (error) {
-      console.error('Error updating fact:', error);
-    }
+    const updatedFacts = facts.map((f) => {
+      if (f.id === fact.id) {
+        return {
+          ...f,
+          [columnName]: f[columnName] + 1,
+        };
+      }
+      return f;
+    });
 
+    setFacts(updatedFacts);
     setIsUpdating(false);
   }
 
@@ -284,8 +251,7 @@ function Fact({ fact, setFacts }) {
       <span
         className='tag'
         style={{
-          backgroundColor: CATEGORIES.find((cat) => cat.name === fact.category)
-            .color,
+          backgroundColor: CATEGORIES.find((cat) => cat.name === fact.category).color,
         }}
       >
         {fact.category}
