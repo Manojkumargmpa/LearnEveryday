@@ -36,8 +36,10 @@ body {
 
 .main {
     display: grid;
-    grid-template-columns: 160px 1fr;
+    grid-template-columns: 170px 1fr;
     gap: 28px;
+  
+    /* both the above lines are to make surethat aside section stays stationary even when the content increases */
 }
 @media (max-width:900px) {
     .main{
@@ -138,8 +140,12 @@ h1 {
 
 ul {
     list-style: none;
+   
 }
-
+.main .facts-list{
+height: 100vh;
+overflow: scroll;
+}
 .source {
     color: #a8a29e;
     text-decoration: none;
