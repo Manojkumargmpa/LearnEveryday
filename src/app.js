@@ -76,7 +76,7 @@ function App() {
         {isLoading ? (
           <Loader />
         ) : (
-          <FactList facts={facts} setFacts={setFacts} />
+          <FactList facts={facts} setFacts={setFacts} setoverallfacts={setoverallfacts} />
         )}
       </main>
     </>
@@ -233,7 +233,7 @@ function CategoryFilter({ setCurrentCategory }) {
   );
 }
 
-function FactList({ facts, setFacts }) {
+function FactList({ facts, setFacts ,setoverallfacts}) {
   if (facts.length === 0)
     return (
       <p className='message'>
@@ -245,7 +245,7 @@ function FactList({ facts, setFacts }) {
     <section>
       <ul className='facts-list'>
         {facts.map((fact) => (
-          <Fact key={fact.id} fact={fact} facts={facts} setFacts={setFacts} />
+          <Fact key={fact.id} fact={fact} facts={facts} setFacts={setFacts}  setoverallfacts={setoverallfacts} />
         ))}
       </ul>
       <p>There are {facts.length} facts in the database. Add your own!</p>
@@ -254,7 +254,7 @@ function FactList({ facts, setFacts }) {
 }
 
 
-function Fact({ fact, facts, setFacts }) {
+function Fact({ fact, facts, setFacts,setoverallfacts }) {
   const [isUpdating, setIsUpdating] = useState(false);
   const isDisputed =
     fact.votesInteresting + fact.votesMindblowing < fact.votesFalse;
@@ -273,6 +273,7 @@ function Fact({ fact, facts, setFacts }) {
     });
 
     setFacts(updatedFacts);
+    setoverallfacts(updatedFacts);
     setIsUpdating(false);
   }
 
