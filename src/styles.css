@@ -33,7 +33,12 @@ body {
     align-items: center;
     justify-content: space-between;
 }
-
+@media (max-width:535px){
+    .header{
+        display: flex;
+        flex-direction: column;
+    }
+}
 .main {
     display: grid;
     grid-template-columns: 170px 1fr;
