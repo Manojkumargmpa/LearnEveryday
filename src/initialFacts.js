@@ -1,5 +1,5 @@
 
-const initialFacts = [
+let initialFacts = [
     {
       id: 1,
       text: 'React is being developed by Meta (formerly Facebook)',
