@@ -1,3 +1,6 @@
+
+there is an issue with storing data as i did not use database ..so when the site is refreshed ,some of the newly added data will be lost
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
