@@ -1,73 +1,49 @@
 import { useEffect, useState } from 'react';
+import axios from "axios";
 import './styles.css';
-let initialFacts = [
-  {
-    id: 1,
-    text: 'React is being developed by Meta (formerly Facebook)',
-    source: 'https://opensource.fb.com/',
-    category: 'technology',
-    votesInteresting: 24,
-    votesMindblowing: 9,
-    votesFalse: 4,
-    createdIn: 2021,
-  },
-  {
-    id: 2,
-    text: 'Millennial dads spend 3 times as much time with their kids than their fathers spent with them. In 1982, 43% of fathers had never changed a diaper. Today, that number is down to 3%',
-    source: 'https://www.mother.ly/parenting/millennial-dads-spend-more-time-with-their-kids',
-    category: 'society',
-    votesInteresting: 11,
-    votesMindblowing: 2,
-    votesFalse: 0,
-    createdIn: 2019,
-  },
-  {
-    id: 3,
-    text: 'Lisbon is the capital of Portugal',
-    source: 'https://en.wikipedia.org/wiki/Lisbon',
-    category: 'society',
-    votesInteresting: 8,
-    votesMindblowing: 3,
-    votesFalse: 1,
-    createdIn: 2015,
-  },
-];
+import { set } from 'mongoose';
+
 function App() {
-  
+
 
   const [showForm, setShowForm] = useState(false);
-  const [facts, setFacts] = useState(initialFacts);
-  const [overallfacts,setoverallfacts]=useState(initialFacts);
+  const [facts, setFacts] = useState([]);
+
   const [isLoading, setIsLoading] = useState(false);
   const [currentCategory, setCurrentCategory] = useState('all');
 
   useEffect(() => {
     async function getFacts() {
       setIsLoading(true);
-    console.log("category has changed to ",currentCategory);
-      let filteredFacts = overallfacts;
-    console.log("before facts: ",facts);
-      if (currentCategory !== 'all')
-        {filteredFacts = overallfacts.filter((fact) => fact.category === currentCategory);}
-    
-      const sortedFacts = filteredFacts.sort(
-        (a, b) => b.votesInteresting - a.votesInteresting
-      );
-    console.log("sortefFacts",sortedFacts);
-      setFacts(sortedFacts);
-      setIsLoading(false);
+     
+      try {
+        const response = await axios.get('http://localhost:5000/api/facts', {
+          params: {
+            category: currentCategory,
+          },
+        });
+        // console.log(response.data);
+        const sortedFacts = response.data.sort(
+          (a, b) => b.votesInteresting - a.votesInteresting
+        );
+        setFacts(sortedFacts);
+      } catch (error) {
+        console.error('Error fetching facts:', error);
+      } finally {
+        setIsLoading(false);
+      }
     }
-    
+
     getFacts();
-    
+
   }, [currentCategory]);
 
   return (
-    
+
     <>
       <Header showForm={showForm} setShowForm={setShowForm} />
       {showForm ? (
-        <NewFactForm setFacts={setFacts} setShowForm={setShowForm} setoverallfacts={setoverallfacts}/>
+        <NewFactForm setFacts={setFacts} setShowForm={setShowForm} />
       ) : null}
 
       <main className='main'>
@@ -76,7 +52,7 @@ function App() {
         {isLoading ? (
           <Loader />
         ) : (
-          <FactList facts={facts} setFacts={setFacts} setoverallfacts={setoverallfacts} />
+          <FactList facts={facts} setFacts={setFacts} />
         )}
       </main>
     </>
@@ -128,7 +104,7 @@ function isValidHttpUrl(string) {
   return url.protocol === 'http:' || url.protocol === 'https:';
 }
 
-function NewFactForm({ setFacts, setShowForm ,setoverallfacts}) {
+function NewFactForm({ setFacts, setShowForm }) {
   const [text, setText] = useState('');
   const [source, setSource] = useState('');
   const [category, setCategory] = useState('');
@@ -141,14 +117,14 @@ function NewFactForm({ setFacts, setShowForm ,setoverallfacts}) {
 
   function createNewFact() {
     return {
-      id: generateRandomId(),
+
       text,
       source,
       category,
       votesInteresting: 0,
       votesMindblowing: 0,
       votesFalse: 0,
-      createdIn: new Date().getFullYear(),
+
     };
   }
 
@@ -159,7 +135,11 @@ function NewFactForm({ setFacts, setShowForm ,setoverallfacts}) {
       const newFact = createNewFact();
 
       setFacts((facts) => [newFact, ...facts]);
-      setoverallfacts((prevfacts)=>[newFact,...prevfacts]);
+      async function posttoapi() {
+
+        await axios.post("http://localhost:5000/api/facts", newFact);
+      }
+      posttoapi();
       setText('');
       setSource('');
       setCategory('');
@@ -211,7 +191,7 @@ function CategoryFilter({ setCurrentCategory }) {
         <li className='category'>
           <button
             className='btn btn-all-categories'
-            onClick={() =>{ setCurrentCategory('all')}}
+            onClick={() => { setCurrentCategory('all') }}
           >
             All
           </button>
@@ -233,7 +213,7 @@ function CategoryFilter({ setCurrentCategory }) {
   );
 }
 
-function FactList({ facts, setFacts ,setoverallfacts}) {
+function FactList({ facts, setFacts }) {
   if (facts.length === 0)
     return (
       <p className='message'>
@@ -245,7 +225,7 @@ function FactList({ facts, setFacts ,setoverallfacts}) {
     <section>
       <ul className='facts-list'>
         {facts.map((fact) => (
-          <Fact key={fact.id} fact={fact} facts={facts} setFacts={setFacts}  setoverallfacts={setoverallfacts} />
+          <Fact key={fact._id} fact={fact} facts={facts} setFacts={setFacts} />
         ))}
       </ul>
       <p>There are {facts.length} facts in the database. Add your own!</p>
@@ -254,16 +234,15 @@ function FactList({ facts, setFacts ,setoverallfacts}) {
 }
 
 
-function Fact({ fact, facts, setFacts,setoverallfacts }) {
+function Fact({ fact, facts, setFacts }) {
   const [isUpdating, setIsUpdating] = useState(false);
   const isDisputed =
     fact.votesInteresting + fact.votesMindblowing < fact.votesFalse;
 
-  function handleVote(columnName) {
+   function handleVote(columnName) {
     setIsUpdating(true);
-
     const updatedFacts = facts.map((f) => {
-      if (f.id === fact.id) {
+      if (f._id === fact._id) {
         return {
           ...f,
           [columnName]: f[columnName] + 1,
@@ -271,10 +250,26 @@ function Fact({ fact, facts, setFacts,setoverallfacts }) {
       }
       return f;
     });
-
     setFacts(updatedFacts);
-    setoverallfacts(updatedFacts);
+
+    try {
+       patchToApi(columnName);
+     
+    } catch (error) {
+      console.error("Error while patching:", error);
+    }
+    async function patchToApi(columnName) {
+      console.log(columnName, fact._id, typeof fact._id);
+      await axios.patch('http://localhost:5000/api/facts', {
+        factID: fact._id,
+        typeofbutton: columnName,
+        count: fact[columnName] + 1,
+      });
+    
+    }
+
     setIsUpdating(false);
+    // console.log(isUpdating);
   }
 
   return (
